@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import { prisma } from "./lib/prisma"
 
 const app = express()
 const port = 3001
@@ -9,6 +10,15 @@ app.use(express.json())
 
 app.get('/health', (req, res) => {
     res.send({ ok: true })
+})
+
+app.get('/db-check', async (req, res) => {
+    try {
+        const usersCount = await prisma.user.count();
+        res.send({ ok: true, usersCount })
+    } catch (e) {
+        res.send({ ok: false, message: `DB check failed: ${e}` })
+    }
 })
 
 app.listen(port, () => {
