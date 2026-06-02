@@ -20,8 +20,8 @@ model User {
   login      String  @unique
   password   String
 
-  director_id  Int
-  director     User   @relation("UserHierarchy", fields: [director_id], references: [id])
+  director_id  Int?
+  director     User?  @relation("UserHierarchy", fields: [director_id], references: [id])
   subordinates User[] @relation("UserHierarchy")
 
   created_tasks     Task[] @relation("TaskCreator")
