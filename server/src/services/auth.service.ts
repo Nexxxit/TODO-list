@@ -1,13 +1,9 @@
 import jwt from "jsonwebtoken"
 import bcrypt from 'bcrypt';
 import { prisma } from "../lib/prisma"
+import type { IAuthData } from "../types/auth.types";
 
-interface IAuthData {
-    login: string,
-    password: string,
-}
-
-export async function login({ login, password }: IAuthData) {
+export async function authLogin({ login, password }: IAuthData) {
 
     if (!login || !password) {
         return { ok: false, statusCode: 400, message: "Поля логин и пароль обязательны" }

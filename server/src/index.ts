@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import { prisma } from "./lib/prisma"
+import authRouter from "./routes/auth.routes"
 
 const app = express()
 const port = 3001
@@ -20,6 +21,8 @@ app.get('/db-check', async (req, res) => {
         res.send({ ok: false, message: `DB check failed: ${e}` })
     }
 })
+
+app.use("/auth", authRouter)
 
 app.listen(port, () => {
     console.log(`Сервер запущен на http://localhost:${port}`)
