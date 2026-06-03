@@ -145,4 +145,32 @@ const updateTask = async (taskId: number, userId: number, data: IUpdateTask) => 
     return { ok: true, statusCode: 200, task: updatedTask }
 }
 
-export { getAllTasks, createTask, updateTask }
+const deleteTask = async (taskId: number, userId: number) => {
+    const currentUser = await prisma.user.findUnique({
+        where: { id: userId }
+    })
+
+    if (!currentUser) {
+        return { ok: false as const, statusCode: 401, message: "Пользователь не найден" }
+    }
+
+    if (currentUser.director_id !== null) {
+        return { ok: false as const, statusCode: 403, message: "Удалять задачи может только руководитель" }
+    }
+
+    const task = await prisma.task.findUnique({
+        where: { id: taskId }
+    })
+
+    if (!task) {
+        return { ok: false as const, statusCode: 404, message: "Задача не найдена" }
+    }
+
+    await prisma.task.delete({
+        where: { id: taskId }
+    })
+
+    return { ok: true as const, statusCode: 200, message: "Задача успешно удалена" }
+}
+
+export { getAllTasks, createTask, updateTask, deleteTask }

@@ -1,5 +1,5 @@
 import type { Request, Response } from "express"
-import { createTask, getAllTasks, updateTask } from "../services/tasks.service"
+import { createTask, deleteTask, getAllTasks, updateTask } from "../services/tasks.service"
 
 const getTasksController = async (req: Request, res: Response) => {
     const result = await getAllTasks()
@@ -53,4 +53,30 @@ const updateTaskController = async (req: Request, res: Response) => {
     }
 }
 
-export { getTasksController, createTaskController, updateTaskController }
+const deleteTaskController = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.userId
+
+        if (!userId) {
+            return res.status(401).json({ message: "Пользователь не найден" })
+        }
+
+        const taskId = Number(req.params.id)
+
+        if (Number.isNaN(taskId)) {
+            return res.status(400).json({ message: "Некорректный id задачи" })
+        }
+
+        const result = await deleteTask(taskId, userId)
+
+        if (!result.ok) {
+            return res.status(result.statusCode).json({ message: result.message })
+        }
+
+        return res.status(result.statusCode).json({ message: result.message })
+    } catch {
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+export { getTasksController, createTaskController, updateTaskController, deleteTaskController }
