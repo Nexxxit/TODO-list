@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import { prisma } from "./lib/prisma"
 import authRouter from "./routes/auth.routes"
-import { tasksRouter } from "./routes/tasks.routes"
+import tasksRouter from "./routes/tasks.routes"
 
 const app = express()
 const port = 3001

@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { getTasksController } from "../controllers/tasks.controller";
+import { createTaskController, getTasksController, updateTaskController } from "../controllers/tasks.controller";
 
 const router = Router()
 
-const tasksRouter = router.get("/", authMiddleware, getTasksController)
+router.get("/", authMiddleware, getTasksController)
+router.post("/", authMiddleware, createTaskController)
+router.patch("/:id", authMiddleware, updateTaskController)
 
-export { tasksRouter }
+export default router

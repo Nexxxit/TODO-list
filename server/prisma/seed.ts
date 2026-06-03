@@ -47,7 +47,53 @@ async function main() {
         }
     })
 
-    console.log("Seed done:", { director: director.login, worker: worker.login })
+    const todo_1 = await prisma.task.upsert({
+        where: { title: "Купить хлеб" },
+        update: {
+            description: "Сходить в магазин и купить хлеб",
+            ending_date: new Date("2026-06-15"),
+            priority: "MEDIUM",
+            status: "TODO",
+            creator_id: director.id,
+            responsible_id: worker.id,
+        },
+        create: {
+            title: "Купить хлеб",
+            description: "Сходить в магазин и купить хлеб",
+            ending_date: new Date("2026-06-15"),
+            priority: "MEDIUM",
+            status: "TODO",
+            creator_id: director.id,
+            responsible_id: worker.id,
+        },
+    })
+
+    const todo_2 = await prisma.task.upsert({
+        where: { title: "Подготовить отчёт" },
+        update: {
+            description: "Собрать данные за квартал",
+            ending_date: new Date("2026-06-20"),
+            priority: "HIGH",
+            status: "IN_PROGRESS",
+            creator_id: director.id,
+            responsible_id: worker.id,
+        },
+        create: {
+            title: "Подготовить отчёт",
+            description: "Собрать данные за квартал",
+            ending_date: new Date("2026-06-20"),
+            priority: "HIGH",
+            status: "IN_PROGRESS",
+            creator_id: director.id,
+            responsible_id: worker.id,
+        },
+    })
+
+    console.log("Seed done:", {
+        director: director.login,
+        worker: worker.login,
+        tasks: [todo_1.title, todo_2.title],
+    })
 }
 
 main()
