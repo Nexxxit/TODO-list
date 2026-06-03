@@ -3,6 +3,7 @@ import { Button } from "../shared/Button"
 import { getToken, setToken } from "../lib/storage"
 import { Navigate, useNavigate } from "react-router"
 import { authLogin } from "../api/auth.api"
+import { Input } from "../shared/Input"
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false)
@@ -40,7 +41,7 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="flex flex-col mx-auto space-y-3 border max-w-md p-4 rounded-lg">
                 <label className="flex flex-col gap-1">
                     Логин
-                    <input
+                    <Input
                         type="text"
                         placeholder="Логин"
                         value={login}
@@ -49,7 +50,7 @@ const LoginPage = () => {
                 </label>
                 <label className="flex flex-col gap-1">
                     Пароль
-                    <input
+                    <Input
                         type="password"
                         placeholder="Пароль"
                         value={password}

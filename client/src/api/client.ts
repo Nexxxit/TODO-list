@@ -19,9 +19,9 @@ const request = async <T>(path: string, options?: RequestOptions): Promise<T> =>
     }
 
     const res = await fetch(`${BASE_URL}${path}`, {
-        method: options.method ?? "GET",
+        method: options?.method ?? "GET",
         headers,
-        body: options.body ? JSON.stringify(options.body) : undefined,
+        body: options?.body ? JSON.stringify(options.body) : undefined,
     })
 
     const data = await res.json()
