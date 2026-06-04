@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors"
-import { prisma } from "./lib/prisma"
+import { getPrisma } from "./lib/prisma"
 import authRouter from "./routes/auth.routes"
 import tasksRouter from "./routes/tasks.routes"
 import usersRouter from "./routes/users.routes"
@@ -16,7 +16,7 @@ app.get("/health", (_req, res) => {
 
 app.get("/db-check", async (_req, res) => {
     try {
-        const usersCount = await prisma.user.count()
+        const usersCount = await getPrisma().user.count()
         res.send({ ok: true, usersCount })
     } catch (e) {
         res.send({ ok: false, message: `DB check failed: ${e}` })

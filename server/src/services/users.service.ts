@@ -1,7 +1,7 @@
-import { prisma } from "../lib/prisma"
+import { getPrisma } from "../lib/prisma"
 
 const getSubordinates = async (directorId: number) => {
-    const subordinates = await prisma.user.findMany({
+    const subordinates = await getPrisma().user.findMany({
         where: { director_id: directorId },
         select: {
             id: true,

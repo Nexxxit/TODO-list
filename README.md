@@ -19,13 +19,13 @@
 
 ## Стек технологий
 
-| Слой | Технологии |
-|------|------------|
-| **Frontend** | React 19, TypeScript, Vite 8, React Router 7, Tailwind CSS 4, Lucide React |
-| **Backend** | Node.js, Express 5, TypeScript, tsx |
-| **БД** | PostgreSQL, Prisma 7 (адаптер Neon для serverless) |
-| **Безопасность** | bcrypt, JSON Web Token |
-| **Деплой** | [Vercel](https://vercel.com) — статика клиента + serverless API (`api/index.ts`) |
+| Слой             | Технологии                                                                       |
+| ---------------- | -------------------------------------------------------------------------------- |
+| **Frontend**     | React 19, TypeScript, Vite 8, React Router 7, Tailwind CSS 4, Lucide React       |
+| **Backend**      | Node.js, Express 5, TypeScript, tsx                                              |
+| **БД**           | PostgreSQL, Prisma 7 (адаптер Neon для serverless)                               |
+| **Безопасность** | bcrypt, JSON Web Token                                                           |
+| **Деплой**       | [Vercel](https://vercel.com) — статика клиента + serverless API (`api/index.ts`) |
 
 ---
 
@@ -121,16 +121,16 @@ npm run build --prefix client
 
 ## API (основные маршруты)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `GET` | `/health` | Проверка работы API |
-| `GET` | `/db-check` | Проверка подключения к БД |
-| `POST` | `/auth/login` | Вход, возвращает JWT |
-| `GET` | `/tasks` | Список задач (требуется `Authorization: Bearer …`) |
-| `POST` | `/tasks` | Создание задачи |
-| `PATCH` | `/tasks/:id` | Обновление задачи |
-| `DELETE` | `/tasks/:id` | Удаление задачи |
-| `GET` | `/users/subordinates` | Подчинённые текущего пользователя |
+| Метод    | Путь                  | Описание                                           |
+| -------- | --------------------- | -------------------------------------------------- |
+| `GET`    | `/health`             | Проверка работы API                                |
+| `GET`    | `/db-check`           | Проверка подключения к БД                          |
+| `POST`   | `/auth/login`         | Вход, возвращает JWT                               |
+| `GET`    | `/tasks`              | Список задач (требуется `Authorization: Bearer …`) |
+| `POST`   | `/tasks`              | Создание задачи                                    |
+| `PATCH`  | `/tasks/:id`          | Обновление задачи                                  |
+| `DELETE` | `/tasks/:id`          | Удаление задачи                                    |
+| `GET`    | `/users/subordinates` | Подчинённые текущего пользователя                  |
 
 ---
 
@@ -150,18 +150,12 @@ npm run build --prefix client
 
 ## Скрипты npm
 
-| Каталог | Команда | Назначение |
-|---------|---------|------------|
-| `server` | `npm run dev` | API с hot-reload (tsx watch) |
-| `server` | `npm run start` | API без watch |
-| `server` | `npm run build` | `prisma generate` |
-| `server` | `npm run seed` | Заполнение БД тестовыми данными |
-| `client` | `npm run dev` | Dev-сервер Vite |
-| `client` | `npm run build` | Production-сборка |
-| `client` | `npm run lint` | ESLint |
-
----
-
-## Лицензия
-
-ISC (серверная часть, см. `server/package.json`). Уточните лицензию для всего репозитория при публикации.
+| Каталог  | Команда         | Назначение                      |
+| -------- | --------------- | ------------------------------- |
+| `server` | `npm run dev`   | API с hot-reload (tsx watch)    |
+| `server` | `npm run start` | API без watch                   |
+| `server` | `npm run build` | `prisma generate`               |
+| `server` | `npm run seed`  | Заполнение БД тестовыми данными |
+| `client` | `npm run dev`   | Dev-сервер Vite                 |
+| `client` | `npm run build` | Production-сборка               |
+| `client` | `npm run lint`  | ESLint                          |

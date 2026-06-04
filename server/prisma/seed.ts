@@ -1,6 +1,6 @@
 import "dotenv/config"
 import bcrypt from "bcrypt"
-import { prisma } from "../src/lib/prisma"
+import { getPrisma } from "../src/lib/prisma"
 
 async function main() {
     const directorHashedPassword = await bcrypt.hash(process.env.PASSWORD_DIRECTOR!, 10)
@@ -9,7 +9,7 @@ async function main() {
     const directorLogin = process.env.LOGIN_DIRECTOR ?? "director";
     const workerLogin = process.env.LOGIN_WORKER ?? "worker";
 
-    const director = await prisma.user.upsert({
+    const director = await getPrisma().user.upsert({
         where: { login: directorLogin },
         update: {
             first_name: "Иван",
@@ -28,7 +28,7 @@ async function main() {
         }
     })
 
-    const worker = await prisma.user.upsert({
+    const worker = await getPrisma().user.upsert({
         where: { login: workerLogin },
         update: {
             first_name: "Петр",
@@ -47,7 +47,7 @@ async function main() {
         }
     })
 
-    const todo_1 = await prisma.task.upsert({
+    const todo_1 = await getPrisma().task.upsert({
         where: { title: "Купить хлеб" },
         update: {
             description: "Сходить в магазин и купить хлеб",
@@ -68,7 +68,7 @@ async function main() {
         },
     })
 
-    const todo_2 = await prisma.task.upsert({
+    const todo_2 = await getPrisma().task.upsert({
         where: { title: "Подготовить отчёт" },
         update: {
             description: "Собрать данные за квартал",
@@ -102,5 +102,5 @@ main()
         process.exit(1);
     })
     .finally(async () => {
-        await prisma.$disconnect();
+        await getPrisma().$disconnect();
     })

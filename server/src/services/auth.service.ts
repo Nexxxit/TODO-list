@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import bcrypt from 'bcrypt';
-import { prisma } from "../lib/prisma"
+import { getPrisma } from "../lib/prisma"
 import type { IAuthData } from "../types/auth.types";
 
 export async function authLogin({ login, password }: IAuthData) {
@@ -13,7 +13,7 @@ export async function authLogin({ login, password }: IAuthData) {
         return { ok: false, statusCode: 500, message: "Сервер не настроен" }
     }
 
-    const user = await prisma.user.findUnique({ where: { login } })
+    const user = await getPrisma().user.findUnique({ where: { login } })
 
     if (!user) {
         return { ok: false, statusCode: 401, message: "Пользователя с таким логином не существует" }

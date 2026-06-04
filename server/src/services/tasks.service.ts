@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma"
+import { getPrisma } from "../lib/prisma"
 import type { ICreateTask, IUpdateTask } from "../types/task.types"
 import type { Prisma } from "@prisma/client"
 
@@ -16,7 +16,7 @@ const taskListInclude = {
 } as const
 
 const findSubordinate = (directorId: number, responsibleId: number) =>
-    prisma.user.findFirst({
+    getPrisma().user.findFirst({
         where: { id: responsibleId, director_id: directorId },
         select: responsibleSelect,
     })
@@ -27,7 +27,7 @@ const withResponsible = <T extends { responsible_id: number }>(
 ) => ({ ...task, responsible })
 
 const getAllTasks = async () => {
-    const allTasks = await prisma.task.findMany({
+    const allTasks = await getPrisma().task.findMany({
         orderBy: { updated_at: "desc" },
         include: taskListInclude,
     })
@@ -51,7 +51,7 @@ const createTask = async (
         }
     }
 
-    const created = await prisma.task.create({
+    const created = await getPrisma().task.create({
         data: {
             title,
             description,
@@ -76,7 +76,7 @@ const updateTask = async (
         return { ok: false as const, statusCode: 400, message: "Нет изменений" }
     }
 
-    const task = await prisma.task.findUnique({ where: { id: taskId } })
+    const task = await getPrisma().task.findUnique({ where: { id: taskId } })
     if (!task) {
         return { ok: false as const, statusCode: 404, message: "Задача не найдена" }
     }
@@ -134,13 +134,13 @@ const updateTask = async (
         }
     }
 
-    const updated = await prisma.task.update({
+    const updated = await getPrisma().task.update({
         where: { id: taskId },
         data: updateData,
     })
 
     if (!responsible) {
-        responsible = await prisma.user.findFirst({
+        responsible = await getPrisma().user.findFirst({
             where: { id: updated.responsible_id },
             select: responsibleSelect,
         })
@@ -158,7 +158,7 @@ const deleteTask = async (taskId: number, isDirector: boolean) => {
         return { ok: false as const, statusCode: 403, message: "Удалять задачи может только руководитель" }
     }
 
-    const deleted = await prisma.task.deleteMany({ where: { id: taskId } })
+    const deleted = await getPrisma().task.deleteMany({ where: { id: taskId } })
 
     if (deleted.count === 0) {
         return { ok: false as const, statusCode: 404, message: "Задача не найдена" }
