@@ -30,7 +30,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
         req.user = {
             userId: payload.userId,
-            login: payload.login
+            login: payload.login,
+            directorId: payload.directorId ?? null,
         }
 
         return next()

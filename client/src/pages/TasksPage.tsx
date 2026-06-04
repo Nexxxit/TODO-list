@@ -101,9 +101,11 @@ const TasksPage = () => {
         setIsDeleting(true)
         setDeleteError('')
 
+        const deletedId = taskToDelete.id
+
         try {
-            await deleteTask(taskToDelete.id)
-            await reloadTasks()
+            await deleteTask(deletedId)
+            setTasks((prev) => prev.filter((item) => item.id !== deletedId))
             setTaskToDelete(null)
         } catch (e) {
             setDeleteError((e as Error).message)

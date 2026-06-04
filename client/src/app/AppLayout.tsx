@@ -28,7 +28,7 @@ const AppLayout = () => {
             )}
 
             <main
-                className={`relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-y-auto px-4 ${isLoginPage ? 'py-0' : 'py-8'}`}
+                className={`scrollbar-hidden relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-y-auto px-4 ${isLoginPage ? 'py-0' : 'py-8'}`}
             >
                 <Outlet />
             </main>

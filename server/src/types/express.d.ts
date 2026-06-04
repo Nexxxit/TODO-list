@@ -5,6 +5,7 @@ declare module "express-serve-static-core" {
         user?: {
             userId: number;
             login: string;
+            directorId: number | null;
         }
     }
 }

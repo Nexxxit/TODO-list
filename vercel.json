@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "installCommand": "npm install --prefix server && npm run build --prefix server && npm install --prefix client",
+  "builds": [
+    {
+      "src": "server/src/app.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/auth(.*)", "dest": "server/src/app.ts" },
+    { "src": "/tasks(.*)", "dest": "server/src/app.ts" },
+    { "src": "/users(.*)", "dest": "server/src/app.ts" },
+    { "src": "/health", "dest": "server/src/app.ts" },
+    { "src": "/db-check", "dest": "server/src/app.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
