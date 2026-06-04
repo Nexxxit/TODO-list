@@ -12,10 +12,10 @@ const sizeClasses = {
 } as const
 
 const baseClasses =
-    "w-full border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 " +
-    "transition-colors outline-none " +
-    "focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/10 " +
-    "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+    "w-full rounded-lg border border-white/20 bg-white/5 text-gray-100 placeholder:text-gray-500 " +
+    "backdrop-blur-md transition-colors outline-none " +
+    "focus-visible:border-purple-400/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 " +
+    "disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-gray-500"
 
 const Input = ({ type = 'text', inputSize = 'md', className = '', disabled, ...rest }: InputProps) => {
     const classes = [

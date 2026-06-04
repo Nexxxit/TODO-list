@@ -67,9 +67,15 @@ const buildInitialState = (
 }
 
 const fieldClassName =
-    'w-full border border-slate-300 bg-white text-slate-900 rounded-lg px-4 py-2 text-base ' +
-    'transition-colors outline-none focus-visible:border-slate-900 focus-visible:ring-2 ' +
-    'focus-visible:ring-slate-900/10 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400'
+    'w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-base text-gray-100 ' +
+    'placeholder:text-gray-500 transition-colors outline-none backdrop-blur-md ' +
+    'focus-visible:border-purple-400/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 ' +
+    'disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-gray-500'
+
+const selectClassName =
+    fieldClassName +
+    ' scheme-dark cursor-pointer bg-slate-800/90 ' +
+    '[&>option]:bg-slate-900 [&>option]:text-gray-100'
 
 const TaskForm = ({
     task,
@@ -157,14 +163,14 @@ const TaskForm = ({
     const disabled = statusOnly
 
     return (
-        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {statusOnly && (
-                <p className="text-sm text-slate-600">
+                <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
                     Задача руководителя: можно изменить только статус.
                 </p>
             )}
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Название
                 <Input
                     value={form.title}
@@ -174,7 +180,7 @@ const TaskForm = ({
                 />
             </label>
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Описание
                 <textarea
                     className={fieldClassName}
@@ -186,7 +192,7 @@ const TaskForm = ({
                 />
             </label>
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Дата завершения
                 <Input
                     type="date"
@@ -197,10 +203,10 @@ const TaskForm = ({
                 />
             </label>
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Приоритет
                 <select
-                    className={fieldClassName}
+                    className={selectClassName}
                     value={form.priority}
                     onChange={e => updateField('priority', e.target.value as TaskPriority)}
                     disabled={disabled || submitting}
@@ -213,10 +219,10 @@ const TaskForm = ({
                 </select>
             </label>
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Статус
                 <select
-                    className={fieldClassName}
+                    className={selectClassName}
                     value={form.status}
                     onChange={e => updateField('status', e.target.value as TaskStatus)}
                     disabled={submitting}
@@ -229,10 +235,10 @@ const TaskForm = ({
                 </select>
             </label>
 
-            <label className="flex flex-col gap-1 text-sm">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Ответственный
                 <select
-                    className={fieldClassName}
+                    className={selectClassName}
                     value={form.responsible_id}
                     onChange={e => updateField('responsible_id', e.target.value)}
                     disabled={disabled || submitting}
@@ -250,13 +256,27 @@ const TaskForm = ({
                 </select>
             </label>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+                <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+                    {error}
+                </p>
+            )}
 
-            <div className="flex gap-2 pt-1">
-                <Button type="submit" disabled={submitting || (!statusOnly && !form.responsible_id)}>
+            <div className="flex gap-2 border-t border-white/10 pt-4">
+                <Button
+                    type="submit"
+                    className="flex-1 border border-white/20 bg-purple-500/40 text-white backdrop-blur-md hover:bg-purple-500/60"
+                    disabled={submitting || (!statusOnly && !form.responsible_id)}
+                >
                     {submitting ? 'Сохранение...' : 'Сохранить'}
                 </Button>
-                <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    className="border-white/20 bg-white/10 text-gray-200 hover:bg-white/20"
+                    onClick={onClose}
+                    disabled={submitting}
+                >
                     Отмена
                 </Button>
             </div>

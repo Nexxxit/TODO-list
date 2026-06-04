@@ -5,38 +5,39 @@ type GroupingControlsProps = {
     onGroupChange: (mode: GroupMode) => void
 }
 
+const modes: { id: string; value: GroupMode; label: string }[] = [
+    { id: 'dateGroup', value: 'date', label: 'По дате завершения' },
+    { id: 'responsibleGroup', value: 'responsible', label: 'По ответственным' },
+    { id: 'noneGroup', value: 'none', label: 'Без группировки' },
+]
+
 const GroupingControls = ({ group, onGroupChange }: GroupingControlsProps) => (
-    <>
-        <label htmlFor="dateGroup">По дате завершения</label>
-        <input
-            type="radio"
-            name="groups"
-            id="dateGroup"
-            value="dateGroup"
-            checked={group === 'date'}
-            onChange={() => onGroupChange('date')}
-        />
-
-        <label htmlFor="responsibleGroup">По ответственным</label>
-        <input
-            type="radio"
-            name="groups"
-            id="responsibleGroup"
-            value="responsibleGroup"
-            checked={group === 'responsible'}
-            onChange={() => onGroupChange('responsible')}
-        />
-
-        <label htmlFor="noneGroup">Без группировки</label>
-        <input
-            type="radio"
-            name="groups"
-            id="noneGroup"
-            value="noneGroup"
-            checked={group === 'none'}
-            onChange={() => onGroupChange('none')}
-        />
-    </>
+    <fieldset className="w-full rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-lg">
+        <legend className="sr-only">Режим группировки</legend>
+        <div className="flex gap-1">
+            {modes.map(mode => (
+                <label
+                    key={mode.id}
+                    htmlFor={mode.id}
+                    className={`flex min-w-0 flex-1 cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-center text-sm font-medium transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-purple-400/50 ${group === mode.value
+                        ? 'bg-purple-500/40 text-white shadow-sm backdrop-blur-md'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-gray-100'
+                        }`}
+                >
+                    <input
+                        type="radio"
+                        name="groups"
+                        id={mode.id}
+                        value={mode.value}
+                        checked={group === mode.value}
+                        onChange={() => onGroupChange(mode.value)}
+                        className="sr-only"
+                    />
+                    {mode.label}
+                </label>
+            ))}
+        </div>
+    </fieldset>
 )
 
 export { GroupingControls }

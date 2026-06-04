@@ -17,12 +17,17 @@ const sizeClasses = {
 
 const variantClasses = {
     primary:
-        'bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 disabled:pointer-events-none',
+        'border border-white/20 bg-purple-500/40 text-white backdrop-blur-md shadow-sm ' +
+        'hover:bg-purple-500/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ' +
+        'focus-visible:outline-purple-400/50 disabled:opacity-50 disabled:pointer-events-none',
     secondary:
-        'border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50 disabled:pointer-events-none'
+        'border border-white/20 bg-white/10 text-gray-200 backdrop-blur-md ' +
+        'hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ' +
+        'focus-visible:outline-white/30 disabled:opacity-50 disabled:pointer-events-none',
 } as const
 
-const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors cursor-pointer'
+const baseClasses =
+    'inline-flex items-center justify-center font-medium transition-colors cursor-pointer'
 
 const Button = ({ children, variant = 'primary', size = 'md', className = '', disabled, type = 'button', ...rest }: ButtonProps) => {
     const classes = [

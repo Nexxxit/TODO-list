@@ -38,6 +38,7 @@ const TasksPage = () => {
                 setLoading(false)
             }
         }
+
         load()
     }, [reloadTasks])
 
@@ -73,14 +74,27 @@ const TasksPage = () => {
         handleCloseModal()
     }
 
-    if (loading) return <p>Загрузка...</p>
-    if (error) return <p className="text-red-600">{error}</p>
+    if (loading) {
+        return (
+            <p className="animate-pulse rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-gray-300 backdrop-blur-lg">
+                Загрузка...
+            </p>
+        )
+    }
+
+    if (error) {
+        return (
+            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-center text-sm text-rose-300 backdrop-blur-lg">
+                {error}
+            </p>
+        )
+    }
 
     const dateGroups = groupByDate(tasks)
     const responsibleOptions = getResponsibleOptionsFromTasks(tasks)
 
     return (
-        <>
+        <div key={group} className="animate-fade-in space-y-8">
             <TasksToolbar
                 group={group}
                 onGroupChange={setGroup}
@@ -116,8 +130,9 @@ const TasksPage = () => {
                     onClose={handleCloseModal}
                 />
             )}
-        </>
+        </div>
     )
 }
 
 export { TasksPage }
+
