@@ -1,0 +1,37 @@
+# Бэкенд доступен только в tailnet (hostname: todo-api).
+# Для Vercel включите Tailscale Funnel — см. DEPLOY.md
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: todo-tailscale
+    hostname: todo-api
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?Set TS_AUTHKEY in .env (reusable, ephemeral key from Tailscale admin)}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: todo-api
+    network_mode: service:tailscale
+    depends_on:
+      - tailscale
+    env_file:
+      - ./server/.env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3001
+    restart: unless-stopped
+
+volumes:
+  tailscale-state:

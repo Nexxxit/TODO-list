@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import { buildCorsOptions } from "./lib/cors"
 import { getPrisma } from "./lib/prisma"
 import authRouter from "./routes/auth.routes"
 import tasksRouter from "./routes/tasks.routes"
@@ -17,7 +18,7 @@ app.use((req, _res, next) => {
     next()
 })
 
-app.use(cors())
+app.use(cors(buildCorsOptions()))
 app.use(express.json())
 
 app.get("/health", (_req, res) => {
