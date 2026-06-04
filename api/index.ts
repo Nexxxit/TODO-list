@@ -1,3 +1,4 @@
+import serverless from "serverless-http"
 import app from "../server/src/app.js"
 
-export default app
+export default serverless(app, { basePath: "/api" })
