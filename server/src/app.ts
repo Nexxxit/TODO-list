@@ -7,6 +7,16 @@ import usersRouter from "./routes/users.routes"
 
 const app = express()
 
+app.use((req, _res, next) => {
+    const url = req.url ?? ""
+    if (url.startsWith("/api/")) {
+        req.url = url.slice(4)
+    } else if (url === "/api") {
+        req.url = "/"
+    }
+    next()
+})
+
 app.use(cors())
 app.use(express.json())
 
