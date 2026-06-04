@@ -1,0 +1,9 @@
+{
+  "name": "todo-list",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client"
+  ]
+}

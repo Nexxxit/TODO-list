@@ -1,12 +1,7 @@
 {
-  "installCommand": "npm install --include=dev --prefix server && npm run build --prefix server && npm install --include=dev --prefix client",
+  "installCommand": "npm install --include=dev && npm run build --prefix server",
   "buildCommand": "npm run build --prefix client",
   "outputDirectory": "client/dist",
-  "functions": {
-    "api/index.ts": {
-      "excludeFiles": "{server/node_modules/prisma/**,server/node_modules/@prisma/engines/**,server/node_modules/typescript/**,server/node_modules/tsx/**}"
-    }
-  },
   "rewrites": [
     { "source": "/auth", "destination": "/api" },
     { "source": "/auth/:path*", "destination": "/api" },

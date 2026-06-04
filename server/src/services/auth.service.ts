@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import bcrypt from 'bcrypt';
+import bcrypt from "bcryptjs"
 import { getPrisma } from "../lib/prisma"
 import type { IAuthData } from "../types/auth.types";
 
