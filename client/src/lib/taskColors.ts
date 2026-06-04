@@ -1,16 +1,20 @@
-const getTitleColor = (status: string, ending_date: string) => {
-    const currentDate = new Date()
-    const deadline = new Date(ending_date)
+import type { TaskStatus } from "../types/task.type"
 
-    const isDeadlineFall = deadline < currentDate
+const getTitleColor = (status: TaskStatus, ending_date: string) => {
+    const startOfDay = (d: Date) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
+    const today = startOfDay(new Date())
+    const deadline = startOfDay(new Date(ending_date))
+    const isOverdue = deadline < today
 
     if (status === "DONE") {
         return "text-green-600"
-    } else if (status !== "DONE" && isDeadlineFall) {
-        return "text-red-600"
-    } else {
-        return "text-gray-600"
     }
+    if (isOverdue) {
+        return "text-red-600"
+    }
+    return "text-gray-600"
 }
 
 export { getTitleColor }

@@ -21,4 +21,4 @@ type TasksResponse = {
     tasks: Task[]
 }
 
-export type { TasksResponse, Task }
+export type { TasksResponse, Task, TaskStatus, TaskPriority }
