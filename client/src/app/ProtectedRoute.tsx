@@ -1,15 +1,12 @@
-import { Navigate } from "react-router"
+import { Navigate, Outlet } from 'react-router'
+import { getToken } from '../lib/storage'
 
-type Props = { children: React.ReactNode }
-
-const ProtectedRoute = ({ children }: Props) => {
-    const token = localStorage.getItem("token")
-
-    if (!token) {
+const ProtectedRoute = () => {
+    if (!getToken()) {
         return <Navigate to="/login" replace />
     }
 
-    return <>{children}</>
+    return <Outlet />
 }
 
 export { ProtectedRoute }
