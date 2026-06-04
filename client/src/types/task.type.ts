@@ -21,4 +21,24 @@ type TasksResponse = {
     tasks: Task[]
 }
 
-export type { TasksResponse, Task, TaskStatus, TaskPriority }
+type CreateTaskBody = {
+    title: string
+    description: string
+    priority: TaskPriority
+    status?: TaskStatus
+    ending_date: string
+    responsible_id: number
+}
+
+type UpdateTaskBody = Partial<CreateTaskBody>
+
+type TaskMutationResponse = {
+    task: Task
+    message?: string
+}
+
+type DeleteTaskResponse = {
+    message?: string
+}
+
+export type { TasksResponse, DeleteTaskResponse, CreateTaskBody, UpdateTaskBody, TaskMutationResponse, Task, TaskStatus, TaskPriority }

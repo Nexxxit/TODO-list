@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getTasks } from "../api/task.api"
+import { deleteTask, getTasks } from "../api/task.api"
 import type { Task } from "../types/task.type"
 import { getTitleColor } from "../lib/taskColors"
 import { formatResponsibleName, groupByDate, groupByResponsible } from "../lib/taskGrouping"
@@ -16,6 +16,7 @@ const TasksPage = () => {
     const [group, setGroup] = useState<GroupMode>('none')
     const [showModal, setShowModal] = useState(false)
     const [isEditMode, setEditMode] = useState(false)
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
     useEffect(() => {
         const load = async () => {
@@ -43,13 +44,10 @@ const TasksPage = () => {
             {new Date(task.ending_date).toLocaleDateString('ru-RU')}
             {formatResponsibleName(task)}
             {task.status}
-            <Button onClick={() => {
-                setEditMode(true)
-                setShowModal(true)
-            }}>
+            <Button onClick={() => handleEditTask(task)}>
                 Редактировать
             </Button>
-            <Button>
+            <Button onClick={() => handleDeleteTask(task.id)}>
                 Удалить
             </Button>
         </li>
@@ -57,9 +55,28 @@ const TasksPage = () => {
 
     const dateGroups = groupByDate(tasks)
 
+    const handleEditTask = (task: Task) => {
+        setSelectedTask(task)
+        setEditMode(true)
+        setShowModal(true)
+    }
+
+    const handleCloseModal = () => {
+        setSelectedTask(null)
+        setShowModal(false)
+        setEditMode(false)
+    }
+
+    const handleDeleteTask = (taskId: number) => {
+        deleteTask(taskId)
+    }
+
     return (
         <>
             <div className="flex flex-col text-center">
+                <Button onClick={() => setShowModal(true)}>
+                    Новая задача
+                </Button>
                 <label htmlFor={"dateGroup"}>По дате завершения</label>
                 <input
                     type="radio"
@@ -146,7 +163,7 @@ const TasksPage = () => {
             )}
 
             {showModal && createPortal(
-                <Modal onClose={() => setShowModal(false)} modalTitle={isEditMode ? "Редактирование задачи" : "Создание задачи"}>
+                <Modal onClose={handleCloseModal} modalTitle={isEditMode ? "Редактирование задачи" : "Создание задачи"}>
                     <div>
                         Форма
                     </div>
