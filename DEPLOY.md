@@ -7,12 +7,13 @@
 1. [Tailscale](https://tailscale.com/download) на машине, где будет Docker.
 2. В [Admin → Keys](https://login.tailscale.com/admin/settings/keys) создайте **Reusable + Ephemeral** auth key.
 3. Скопируйте `server/.env.example` → `server/.env`, заполните `DATABASE_URL`, `JWT_SECRET`, логины.
-4. В корне: `.env.example` → `.env`, укажите `TS_AUTHKEY`.
+4. В корне создайте `.env` с `TS_AUTHKEY=<ключ>` (и при необходимости `SKIP_DB_MIGRATE=false`).
 5. В `server/.env` добавьте `CORS_ORIGINS` с URL Vercel (см. ниже).
 
 ### 2. Запуск
 
 ```bash
+# из корня репозитория (не из server/)
 docker compose up -d --build
 ```
 
@@ -27,8 +28,22 @@ curl http://todo-api:3001/health
 Браузер на Vercel **не** видит приватный tailnet. Нужен публичный HTTPS через Funnel:
 
 ```bash
+# в фоне (не закрывается с терминалом):
+docker exec -d todo-tailscale tailscale funnel --bg 3001
+
+# или интерактивно (закроется по Ctrl+C):
 docker exec -it todo-tailscale tailscale funnel 3001
 ```
+
+**Миграции в Docker:** по умолчанию `SKIP_DB_MIGRATE=true` (см. `docker-compose.yml`), чтобы контейнер не зависал на Neon lock. Первый раз примените миграции локально:
+
+```bash
+cd server
+set DIRECT_DATABASE_URL=...   # direct URL из Neon
+npx prisma migrate deploy
+```
+
+Если нужны миграции при каждом старте контейнера: в корневом `.env` задайте `SKIP_DB_MIGRATE=false`.
 
 Скопируйте выданный URL (например `https://todo-api.<tailnet>.ts.net`) — это `VITE_API_URL` для Vercel.
 

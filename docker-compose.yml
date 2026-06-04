@@ -31,6 +31,8 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 3001
+      # После первого успешного migrate можно поставить "true", чтобы не ждать lock при каждом рестарте
+      SKIP_DB_MIGRATE: ${SKIP_DB_MIGRATE:-true}
     restart: unless-stopped
 
 volumes:
