@@ -2,11 +2,6 @@
   "installCommand": "npm install --include=dev && npm run build --prefix server",
   "buildCommand": "npm run build --prefix client",
   "outputDirectory": "client/dist",
-  "functions": {
-    "api/index.ts": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     { "source": "/auth", "destination": "/api/auth" },
     { "source": "/auth/:path*", "destination": "/api/auth/:path*" },
