@@ -1,114 +1,244 @@
-# Развёртывание
+# Развёртывание (Docker + Tailscale + Vercel)
 
-## Бэкенд: Docker + Tailscale
+## Публичные адреса этого проекта
 
-### 1. Подготовка
+| Сервис                     | URL                                      |
+| -------------------------- | ---------------------------------------- |
+| **Фронт (Vercel)**         | https://todo-list-client-ecru.vercel.app |
+| **API (Tailscale Funnel)** | https://todo-api.tailf2240f.ts.net       |
 
-1. [Tailscale](https://tailscale.com/download) на машине, где будет Docker.
-2. В [Admin → Keys](https://login.tailscale.com/admin/settings/keys) создайте **Reusable + Ephemeral** auth key.
-3. Скопируйте `server/.env.example` → `server/.env`, заполните `DATABASE_URL`, `JWT_SECRET`, логины.
-4. В корне создайте `.env` с `TS_AUTHKEY=<ключ>` (и при необходимости `SKIP_DB_MIGRATE=false`).
-5. В `server/.env` добавьте `CORS_ORIGINS` с URL Vercel (см. ниже).
-
-### 2. Запуск
+URL Funnel привязан к вашему tailnet. После первого `funnel --bg` свой адрес смотрите так:
 
 ```bash
-# из корня репозитория (не из server/)
-docker compose up -d --build
+docker exec todo-tailscale tailscale funnel status
 ```
 
-Проверка из tailnet (с устройства в той же сети Tailscale):
+---
 
-```bash
-curl http://todo-api:3001/health
+## Архитектура
+
+```
+Браузер → Vercel (статика React)
+              ↓ VITE_API_URL
+         Tailscale Funnel (HTTPS)
+              ↓
+         Docker: todo-api :3001
+              ↓
+         Neon PostgreSQL
 ```
 
-### 3. Доступ для Vercel (Tailscale Funnel)
+---
 
-Браузер на Vercel **не** видит приватный tailnet. Нужен публичный HTTPS через Funnel:
+## Требования
 
-```bash
-# в фоне (не закрывается с терминалом):
-docker exec -d todo-tailscale tailscale funnel --bg 3001
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (WSL2 на Windows)
+- [Tailscale](https://tailscale.com/download) на хосте
+- Аккаунт [Neon](https://neon.tech) (PostgreSQL)
+- Аккаунт [Vercel](https://vercel.com)
 
-# или интерактивно (закроется по Ctrl+C):
-docker exec -it todo-tailscale tailscale funnel 3001
+---
+
+## 1. Подготовка окружения
+
+### 1.1. Файлы конфигурации
+
+Создайте файлы вручную (из корня репозитория):
+
+- `.env` — для Docker Compose (`TS_AUTHKEY`, опционально `SKIP_DB_MIGRATE`)
+- `server/.env` — для API и Prisma
+- `client/.env` — только для локальной разработки (`VITE_API_URL`)
+
+Заполните:
+
+| Файл          | Переменные                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `.env`        | `TS_AUTHKEY` — [ключ Tailscale](https://login.tailscale.com/admin/settings/keys) (Reusable + Ephemeral)        |
+| `server/.env` | `DATABASE_URL` (pooled), `DIRECT_DATABASE_URL` (direct), `JWT_SECRET`, `LOGIN_*`, `PASSWORD_*`, `CORS_ORIGINS` |
+
+**Neon:** в консоли два connection string — **Pooled** → `DATABASE_URL`, **Direct** → `DIRECT_DATABASE_URL` (в хосте **нет** `-pooler`).
+
+**CORS:** укажите origin Vercel без слэша в конце, например:
+
+```env
+CORS_ORIGINS=https://todo-list-client-ecru.vercel.app
 ```
 
-**Миграции в Docker:** по умолчанию `SKIP_DB_MIGRATE=true` (см. `docker-compose.yml`), чтобы контейнер не зависал на Neon lock. Первый раз примените миграции локально:
+Для preview-деплоев добавьте через запятую.
+
+### 1.2. Миграции БД (один раз на машине разработчика)
+
+Из `server/`, с **direct** URL (не pooler):
+
+**PowerShell:**
+
+```powershell
+cd server
+$line = Get-Content .env | Where-Object { $_ -match '^DIRECT_DATABASE_URL=' }
+$env:DATABASE_URL = ($line -replace '^DIRECT_DATABASE_URL="?|"$','')
+$env:PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "true"
+npx prisma migrate deploy
+npm run seed
+```
+
+**bash:**
 
 ```bash
 cd server
-set DIRECT_DATABASE_URL=...   # direct URL из Neon
+export DATABASE_URL="$DIRECT_DATABASE_URL"
+export PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=true
 npx prisma migrate deploy
+npm run seed
 ```
 
-Если нужны миграции при каждом старте контейнера: в корневом `.env` задайте `SKIP_DB_MIGRATE=false`.
+---
 
-Скопируйте выданный URL (например `https://todo-api.<tailnet>.ts.net`) — это `VITE_API_URL` для Vercel.
+## 2. Запуск бэкенда (Docker + Tailscale)
+
+Все команды — **из корня репозитория**, не из `server/`:
+
+```bash
+docker compose up -d --build
+```
+
+Проверка API внутри tailnet:
+
+```bash
+docker exec todo-api wget -qO- http://127.0.0.1:3001/health
+# ожидается: {"ok":true}
+```
+
+### Tailscale Funnel (доступ для Vercel)
+
+```bash
+# в фоне (рекомендуется)
+docker exec -d todo-tailscale tailscale funnel --bg 3001
+
+# статус и URL
+docker exec todo-tailscale tailscale funnel status
+```
+
+Скопируйте HTTPS-URL (например `https://todo-api.<tailnet>.ts.net`) — он нужен для `VITE_API_URL` на Vercel.
+
+Проверка с интернета:
+
+```bash
+curl https://todo-api.tailf2240f.ts.net/health
+```
 
 Отключить Funnel:
 
 ```bash
-docker exec -it todo-tailscale tailscale funnel --https=3001 off
+docker exec todo-tailscale tailscale funnel --https=3001 off
 ```
 
-Альтернатива без публичного API: фронт только локально / только с Tailscale на ПК (не типичный сценарий для Vercel).
+### Миграции при старте контейнера
+
+По умолчанию `SKIP_DB_MIGRATE=true` в `docker-compose.yml`, чтобы контейнер не зависал на Neon advisory lock. Схему применяйте вручную (раздел 1.2).
+
+Чтобы гонять migrate при каждом старте: в корневом `.env` задайте `SKIP_DB_MIGRATE=false`.
 
 ---
 
-## Клиент: Vercel
+## 3. После перезагрузки ПК
 
-### 1. Репозиторий
-
-Подключите GitHub/GitLab репозиторий в [vercel.com](https://vercel.com).
-
-### 2. Настройки проекта
-
-| Параметр | Значение |
-|----------|----------|
-| Root Directory | `client` |
-| Framework Preset | Vite |
-| Install Command | `npm install` (или пусто — подхватит `client/vercel.json`) |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-
-**Важно:** не используйте `npm run build --prefix server` и не собирайте папку `server` на Vercel — бэкенд в Docker, не на Vercel.
-
-Если в Dashboard уже задана своя Build Command — сбросьте на дефолт (Override → Use project settings) или удалите override, чтобы применился `client/vercel.json`.
-
-### Ошибка `client/server/package.json` ENOENT
-
-Причина: Root Directory = `client`, а Build Command пытается собрать `server` (`--prefix server` → путь `client/server`).
-
-Исправление: Build Command = `npm run build`, без `--prefix server`.
-
-### 3. Переменные окружения
-
-| Имя | Значение |
-|-----|----------|
-| `VITE_API_URL` | URL API (Funnel: `https://todo-api.<tailnet>.ts.net` **без** слэша в конце) |
-
-Пересоберите деплой после изменения env.
-
-### 4. CORS на сервере
-
-В `server/.env` / `CORS_ORIGINS` укажите точный origin Vercel, например:
-
+```bash
+docker compose up -d
+docker exec -d todo-tailscale tailscale funnel --bg 3001
+docker exec todo-tailscale tailscale funnel status
 ```
-CORS_ORIGINS=https://your-app.vercel.app
-```
-
-Для preview-деплоев добавьте через запятую: `https://your-app.vercel.app,https://your-app-xxx.vercel.app`
-
-### 5. Проверка
-
-1. Откройте сайт на Vercel → логин.
-2. DevTools → Network: запросы идут на `VITE_API_URL`, без CORS-ошибок.
 
 ---
 
-## Локальная разработка
+## 4. Клиент на Vercel
 
-- Сервер: `cd server && npm run dev`
-- Клиент: `cd client`, в `.env` — `VITE_API_URL=http://localhost:3001`
+Репозиторий: [Nexxxit/TODO-list](https://github.com/Nexxxit/TODO-list) (или ваш fork).
+
+### Настройки проекта
+
+| Параметр         | Значение        |
+| ---------------- | --------------- |
+| Root Directory   | `client`        |
+| Framework Preset | Vite            |
+| Install Command  | `npm install`   |
+| Build Command    | `npm run build` |
+| Output Directory | `dist`          |
+| Node.js Version  | 20.x            |
+
+**Не используйте** `npm run build --prefix server` и `npm install --prefix=..` — бэкенд не на Vercel.
+
+Настройки зафиксированы в `client/vercel.json` (Root Directory = `client`). Корневого `vercel.json` и папки `api/` в репозитории нет — это был старый serverless-вариант API на Vercel.
+
+Не путать с `client/src/api/` — это HTTP-клиент фронта, его не удалять.
+
+### Переменные окружения (Vercel)
+
+| Имя            | Значение                                                                   |
+| -------------- | -------------------------------------------------------------------------- |
+| `VITE_API_URL` | `https://todo-api.tailf2240f.ts.net` (ваш Funnel URL, **без** `/` в конце) |
+
+После изменения — **Redeploy**.
+
+### Проверка
+
+1. Откройте https://todo-list-client-ecru.vercel.app
+2. F12 → Network → логин
+3. Запросы на `https://todo-api....ts.net/auth/login`, статус 200, без CORS
+
+---
+
+## 5. Локальная разработка
+
+```bash
+# терминал 1
+cd server && npm run dev
+
+# терминал 2
+cd client && npm run dev
+```
+
+`client/.env`:
+
+```env
+VITE_API_URL=http://localhost:3001
+```
+
+---
+
+## Частые ошибки
+
+### `funnel: command not found` в PowerShell
+
+Funnel не ставится на Windows отдельно. Команда только через Docker:
+
+```bash
+docker exec todo-tailscale tailscale funnel status
+```
+
+### `prisma migrate deploy` → P1002 (advisory lock)
+
+Используется pooler вместо direct. Задайте `DATABASE_URL` из `DIRECT_DATABASE_URL` и `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=true` (см. раздел 1.2).
+
+### Vercel: `client/server/package.json` ENOENT
+
+В Build Command указан `--prefix server`. Должно быть: `npm run build`, Root Directory = `client`.
+
+### Funnel 502, в Docker health OK
+
+Funnel не запущен или остановлен Ctrl+C. Снова: `docker exec -d todo-tailscale tailscale funnel --bg 3001`.
+
+### `exec /docker-entrypoint.sh: no such file`
+
+CRLF в `docker-entrypoint.sh` на Windows. В Dockerfile уже есть `sed` для исправления — пересоберите: `docker compose up -d --build`.
+
+---
+
+## Чеклист для нового разработчика
+
+- [ ] `server/.env` и `.env` заполнены
+- [ ] `npx prisma migrate deploy` + `npm run seed` прошли на direct URL
+- [ ] `docker compose up -d --build` из корня
+- [ ] `docker exec ... funnel --bg 3001`
+- [ ] `/health` отвечает по Funnel URL
+- [ ] На Vercel задан `VITE_API_URL`, сделан Redeploy
+- [ ] `CORS_ORIGINS` совпадает с URL Vercel
+- [ ] Логин на https://todo-list-client-ecru.vercel.app работает
