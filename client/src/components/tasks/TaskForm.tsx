@@ -164,11 +164,6 @@ const TaskForm = ({
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {statusOnly && (
-                <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-                    Задача руководителя: можно изменить только статус.
-                </p>
-            )}
 
             <label className="flex flex-col gap-1.5 text-sm font-medium text-gray-300">
                 Название

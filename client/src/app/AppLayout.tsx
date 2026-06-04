@@ -8,7 +8,7 @@ const AppLayout = () => {
     const showLogout = Boolean(getToken()) && !isLoginPage
 
     return (
-        <div className="relative flex h-dvh flex-col overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-purple-950 text-gray-200">
+        <div className="relative flex h-dvh flex-col overflow-x-hidden bg-linear-to-br from-slate-950 via-slate-900 to-purple-950 text-gray-200">
             <div
                 className="pointer-events-none fixed -left-32 top-0 h-96 w-96 animate-blob rounded-full bg-purple-600/20 blur-3xl"
                 aria-hidden

@@ -71,5 +71,7 @@ const groupByResponsible = (tasks: Task[]): ResponsibleGroup[] => {
     }))
 }
 
-export { groupByDate, groupByResponsible, formatResponsibleName }
+const isTaskOverdue = (ending_date: string) => getDateBucket(ending_date) === 'overdue'
+
+export { groupByDate, groupByResponsible, formatResponsibleName, isTaskOverdue }
 export type { DateGroups, ResponsibleGroup, DateBucket }

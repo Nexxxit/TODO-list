@@ -32,7 +32,7 @@ const Modal = ({ onClose, children, modalTitle, className = '' }: ModalProps) =>
                         type="button"
                         onClick={onClose}
                         aria-label="Закрыть"
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-gray-300 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/30 hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400/50 active:scale-95"
+                        className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-gray-300 backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/30 hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400/50 active:scale-95"
                     >
                         <X className="h-4 w-4" strokeWidth={2.5} aria-hidden />
                     </button>

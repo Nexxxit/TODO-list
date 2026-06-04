@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react"
 
-type ButtonSize = 'sm' | 'md' | 'lg'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'icon'
 type ButtonVariant = 'primary' | 'secondary'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -13,6 +13,7 @@ const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm rounded-md',
     md: 'px-4 py-2 text-base rounded-lg',
     lg: 'px-6 py-3 text-lg rounded-lg',
+    icon: 'h-9 w-9 p-0 text-sm rounded-md',
 } as const
 
 const variantClasses = {
