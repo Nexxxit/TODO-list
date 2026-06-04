@@ -97,7 +97,10 @@ const TaskItem = ({ task, onEdit, onDelete }: TaskItemProps) => (
                 type="button"
                 aria-label="Удалить задачу"
                 className="flex !h-9 !w-9 shrink-0 !p-0 items-center justify-center self-start border-rose-500/30 bg-rose-500/10 text-rose-200 backdrop-blur-md hover:bg-rose-500/20"
-                onClick={() => onDelete(task.id)}
+                onClick={(event) => {
+                    event.stopPropagation()
+                    onDelete(task.id)
+                }}
             >
                 <Trash2 className="h-4 w-4" aria-hidden />
             </Button>

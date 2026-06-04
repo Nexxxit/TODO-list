@@ -1,6 +1,7 @@
 import { useState, type SubmitEvent } from 'react'
 import { createTask, updateTask } from '../../api/task.api'
 import { getSessionUser } from '../../lib/authSession'
+import { isBossTaskForSubordinate } from '../../lib/taskPermissions'
 import type { ResponsibleOption } from '../../lib/responsibleOptions'
 import { Button } from '../../shared/Button'
 import { Input } from '../../shared/Input'
@@ -96,8 +97,7 @@ const TaskForm = ({
         isEditMode &&
         task !== null &&
         session !== null &&
-        session.login === 'worker' &&
-        task.creator_id !== session.userId
+        isBossTaskForSubordinate(task, session)
 
     const updateField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
         setForm(prev => ({ ...prev, [key]: value }))

@@ -1,29 +1,40 @@
 import { useCallback, useEffect, useState } from 'react'
 import { deleteTask, getTasks } from '../api/task.api'
+import { getSubordinates } from '../api/users.api'
+import type { SubordinateUser } from '../types/user.type'
 import {
     TaskList,
     TaskListByDate,
     TaskListByResponsible,
+    DeleteTaskModal,
     TaskModal,
     TasksToolbar,
     type GroupMode,
 } from '../components/tasks'
 import { groupByDate } from '../lib/taskGrouping'
-import { getResponsibleOptionsFromTasks } from '../lib/responsibleOptions'
+import { buildResponsibleOptions } from '../lib/responsibleOptions'
 import type { Task } from '../types/task.type'
 
 const TasksPage = () => {
     const [tasks, setTasks] = useState<Task[]>([])
+    const [subordinates, setSubordinates] = useState<SubordinateUser[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [group, setGroup] = useState<GroupMode>('none')
     const [showModal, setShowModal] = useState(false)
     const [isEditMode, setEditMode] = useState(false)
     const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+    const [taskToDelete, setTaskToDelete] = useState<Task | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [deleteError, setDeleteError] = useState('')
 
     const reloadTasks = useCallback(async () => {
-        const data = await getTasks()
-        setTasks(data)
+        const [tasksData, subordinatesData] = await Promise.all([
+            getTasks(),
+            getSubordinates(),
+        ])
+        setTasks(tasksData)
+        setSubordinates(subordinatesData)
     }, [])
 
     useEffect(() => {
@@ -60,12 +71,44 @@ const TasksPage = () => {
         setEditMode(false)
     }
 
-    const handleDeleteTask = async (taskId: number) => {
+    const handleRequestDelete = (taskId: number) => {
+        const task = tasks.find((item) => item.id === taskId)
+        if (!task) {
+            return
+        }
+
+        if (showModal) {
+            handleCloseModal()
+        }
+
+        setDeleteError('')
+        setTaskToDelete(task)
+    }
+
+    const handleCloseDeleteModal = () => {
+        if (isDeleting) {
+            return
+        }
+        setDeleteError('')
+        setTaskToDelete(null)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!taskToDelete || isDeleting) {
+            return
+        }
+
+        setIsDeleting(true)
+        setDeleteError('')
+
         try {
-            await deleteTask(taskId)
+            await deleteTask(taskToDelete.id)
             await reloadTasks()
+            setTaskToDelete(null)
         } catch (e) {
-            setError((e as Error).message)
+            setDeleteError((e as Error).message)
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -91,7 +134,11 @@ const TasksPage = () => {
     }
 
     const dateGroups = groupByDate(tasks)
-    const responsibleOptions = getResponsibleOptionsFromTasks(tasks)
+    const responsibleOptions = buildResponsibleOptions(
+        subordinates,
+        tasks,
+        isEditMode ? selectedTask : null
+    )
 
     return (
         <div key={group} className="animate-fade-in space-y-8">
@@ -102,14 +149,14 @@ const TasksPage = () => {
             />
 
             {group === 'none' && (
-                <TaskList tasks={tasks} onEdit={handleEditTask} onDelete={handleDeleteTask} />
+                <TaskList tasks={tasks} onEdit={handleEditTask} onDelete={handleRequestDelete} />
             )}
 
             {group === 'date' && (
                 <TaskListByDate
                     dateGroups={dateGroups}
                     onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
+                    onDelete={handleRequestDelete}
                 />
             )}
 
@@ -117,7 +164,7 @@ const TasksPage = () => {
                 <TaskListByResponsible
                     tasks={tasks}
                     onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
+                    onDelete={handleRequestDelete}
                 />
             )}
 
@@ -128,6 +175,16 @@ const TasksPage = () => {
                     responsibleOptions={responsibleOptions}
                     onSuccess={handleTaskSaved}
                     onClose={handleCloseModal}
+                />
+            )}
+
+            {taskToDelete && (
+                <DeleteTaskModal
+                    task={taskToDelete}
+                    isDeleting={isDeleting}
+                    error={deleteError}
+                    onConfirm={handleConfirmDelete}
+                    onClose={handleCloseDeleteModal}
                 />
             )}
         </div>

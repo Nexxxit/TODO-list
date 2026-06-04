@@ -25,7 +25,11 @@ export async function authLogin({ login, password }: IAuthData) {
         return { ok: false, statusCode: 401, message: "Пользователь ввел неверный пароль" }
     }
 
-    const token = jwt.sign({ userId: user.id, login: user.login }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    const token = jwt.sign(
+        { userId: user.id, login: user.login, directorId: user.director_id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+    )
 
     return { ok: true, statusCode: 200, token }
 
