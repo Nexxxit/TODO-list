@@ -2,6 +2,7 @@ type TaskPriority = 'HIGH' | 'MEDIUM' | 'LOW'
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 
 type TaskResponsible = {
+    id: number
     first_name: string
     last_name: string
     patronymic: string
@@ -14,6 +15,8 @@ type Task = {
     priority: TaskPriority
     status: TaskStatus
     ending_date: string
+    creator_id: number
+    responsible_id: number
     responsible: TaskResponsible
 }
 

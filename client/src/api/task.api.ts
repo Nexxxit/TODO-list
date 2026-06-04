@@ -30,7 +30,7 @@ const deleteTask = async (taskId: number): Promise<string> => {
         method: "DELETE"
     })
 
-    return data.message
+    return data.message ?? ''
 }
 
 export { getTasks, createTask, updateTask, deleteTask }
